@@ -1,7 +1,9 @@
-package com.embrakX.jobms.job.controller;
+package com.embrakX.Jobms.job.controller;
 
-import com.embrakX.jobms.job.entity.Job;
-import com.embrakX.jobms.job.service.JobService;
+
+import com.embrakX.Jobms.job.dto.JobwithCompanyDto;
+import com.embrakX.Jobms.job.entity.Job;
+import com.embrakX.Jobms.job.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ public class JobController {
 
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Job>> findAll(){
+    public ResponseEntity<List<JobwithCompanyDto>> findAll(){
         return new  ResponseEntity<>(jobService.findAll(),HttpStatus.OK);
 
     };
