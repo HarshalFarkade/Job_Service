@@ -1,6 +1,8 @@
-package com.embrakX.jobms.job.service;
+package com.embrakX.Jobms.job.service;
 
-import com.embrakX.jobms.job.entity.Job;
+
+import com.embrakX.Jobms.job.dto.JobwithCompanyDto;
+import com.embrakX.Jobms.job.entity.Job;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 @Service
 public interface JobService {
 
-    List<Job> findAll();
+    List<JobwithCompanyDto> findAll();
 
      Job createJob(Job job);
 

@@ -1,6 +1,6 @@
-package com.embrakX.jobms.job.repository;
+package com.embrakX.Jobms.job.repository;
 
-import com.embrakX.jobms.job.entity.Job;
+import com.embrakX.Jobms.job.entity.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
