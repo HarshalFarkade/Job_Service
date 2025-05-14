@@ -1,7 +1,7 @@
 package com.embrakX.Jobms.job.controller;
 
 
-import com.embrakX.Jobms.job.dto.JobwithCompanyDto;
+import com.embrakX.Jobms.job.dto.JobDto;
 import com.embrakX.Jobms.job.entity.Job;
 import com.embrakX.Jobms.job.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +20,16 @@ public class JobController {
 
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<JobwithCompanyDto>> findAll(){
+    public ResponseEntity<List<JobDto>> findAll(){
         return new  ResponseEntity<>(jobService.findAll(),HttpStatus.OK);
 
     };
 
     @GetMapping("/getById/{id}")
-    public ResponseEntity<Job> jobById(@PathVariable Long id){
-        Job job = jobService.getJobById(id);
-        if (job != null){
-            return new ResponseEntity<>(job,HttpStatus.OK);
+    public ResponseEntity<JobDto> jobById(@PathVariable Long id){
+        JobDto jobDto = jobService.getJobById(id);
+        if (jobDto != null){
+            return new ResponseEntity<>(jobDto,HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -43,8 +43,8 @@ public class JobController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteJobById(@PathVariable Long id){
-        Job job =jobService.getJobById(id);
-        if (job != null){
+       boolean deleted=jobService.deleteById(id);
+        if (deleted){
             jobService.deleteById(id);
             return new ResponseEntity<>("Job Deleted !",HttpStatus.OK);
         }

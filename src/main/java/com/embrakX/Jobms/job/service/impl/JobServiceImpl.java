@@ -1,11 +1,18 @@
 package com.embrakX.Jobms.job.service.impl;
 
-import com.embrakX.Jobms.job.dto.JobwithCompanyDto;
+import com.embrakX.Jobms.job.clients.CompanyClient;
+import com.embrakX.Jobms.job.clients.ReviewClient;
+import com.embrakX.Jobms.job.dto.JobDto;
 import com.embrakX.Jobms.job.entity.Job;
 import com.embrakX.Jobms.job.externial.Company;
+import com.embrakX.Jobms.job.externial.Review;
+import com.embrakX.Jobms.job.mapper.JobMapper;
 import com.embrakX.Jobms.job.repository.JobRepository;
 import com.embrakX.Jobms.job.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,11 +27,20 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    RestTemplate restTemplate;
+
+    @Autowired
+    private CompanyClient companyClient;
+
+    @Autowired
+    private ReviewClient reviewClient;
+
 
     @Override
-    public List<JobwithCompanyDto> findAll() {
+    public List<JobDto> findAll() {
         List<Job> jobs = jobRepository.findAll();
-        List<JobwithCompanyDto> jobwithCompanyDtos = new ArrayList<>();
+        List<JobDto> jobDtos = new ArrayList<>();
         return jobs.stream().map(this::convertToDTo).collect(Collectors.toList());
     }
 
@@ -42,18 +58,19 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job getJobById(Long id) {
-       return jobRepository.findById(id).get();
+    public JobDto getJobById(Long id) {
+       Job job= jobRepository.findById(id).get();
+       return convertToDTo(job);
     }
 
     @Override
-    public String deleteById(Long id) {
-      Optional<Job> job = jobRepository.findById(id);
-       if (job.isPresent()){
-           jobRepository.deleteById(id);
-           return "Job Deleted!!";
-       }
-       return "Job With Id is not Found";
+    public boolean deleteById(Long id) {
+      try{
+          jobRepository.deleteById(id);
+          return true;
+      }catch (Exception e){
+          return false;
+      }
 
     }
 
@@ -73,18 +90,19 @@ public class JobServiceImpl implements JobService {
        return null;
     }
 
-    private JobwithCompanyDto convertToDTo(Job job){
+    private JobDto convertToDTo(Job job){
 
-            JobwithCompanyDto jobwithCompanyDto = new JobwithCompanyDto();
-            jobwithCompanyDto.setJob(job);
-
-        RestTemplate restTemplate = new RestTemplate();
-            Company company= restTemplate.getForObject("http://localhost:8081/companies/"+job.getCompanyId(),
-                    Company.class);
-            jobwithCompanyDto.setCompany(company);
-
-            return jobwithCompanyDto;
-
-
+//        RestTemplate restTemplate = new RestTemplate();
+            Company company= companyClient.getCompany(job.getCompanyId());
+//       ResponseEntity<List<Review>> reviewResponse = restTemplate.exchange(
+//                "http://REVIEW-SERVICE:8083/reviews?companyId=" + job.getCompanyId(),
+//                HttpMethod.GET,
+//                null,
+//                new ParameterizedTypeReference<List<Review>>() {
+//                });
+       List<Review> reviews =reviewClient.getReviews(job.getCompanyId());
+            JobDto jobDto = JobMapper
+                    .mapToJobWithCompanyDto(job,company,reviews);
+            return jobDto;
     }
 }
