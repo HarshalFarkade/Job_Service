@@ -9,6 +9,9 @@ import com.embrakX.Jobms.job.externial.Review;
 import com.embrakX.Jobms.job.mapper.JobMapper;
 import com.embrakX.Jobms.job.repository.JobRepository;
 import com.embrakX.Jobms.job.service.JobService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -36,12 +39,27 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private ReviewClient reviewClient;
 
+    int attempt =0;
+
 
     @Override
+//    @CircuitBreaker(name="companyBreaker" ,
+//            fallbackMethod ="companyBreakerFallback")
+//    @Retry(name ="companyBreaker",
+//            fallbackMethod ="companyBreakerFallback")
+    @RateLimiter(name = "companyBreaker",
+    fallbackMethod = "companyBreakerFallback")
     public List<JobDto> findAll() {
+        System.out.println("Attempt: "+ ++attempt);
         List<Job> jobs = jobRepository.findAll();
         List<JobDto> jobDtos = new ArrayList<>();
         return jobs.stream().map(this::convertToDTo).collect(Collectors.toList());
+    }
+
+    public List<String> companyBreakerFallback(Exception e){
+        List<String> list = new ArrayList<>();
+        list.add("dummy");
+        return list;
     }
 
     @Override
