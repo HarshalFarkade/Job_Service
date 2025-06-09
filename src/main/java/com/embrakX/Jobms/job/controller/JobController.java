@@ -32,14 +32,14 @@ public class JobController {
             return new ResponseEntity<>(jobDto,HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    };
 
     @PostMapping("/create")
     public ResponseEntity<String>  createJob(@RequestBody Job job){
         jobService.createJob(job);
 
         return new  ResponseEntity<>("Job Added Successfully", HttpStatus.CREATED);
-    }
+    };
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteJobById(@PathVariable Long id){
@@ -59,5 +59,5 @@ public class JobController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-    }
+    };
 }
